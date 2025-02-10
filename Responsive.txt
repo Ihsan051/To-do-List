@@ -1,0 +1,88 @@
+Responsive
+username
+password
+alamat
+tanggal lahir
+email
+jenis kelamin
+nomor hp
+
+
+text di logo di hilangkan
+shadow list di background diganti putih
+warna button login diganti ke warna yang lebih kontras
+tulisan dtidak punya akun di bawh login di tambahi marginnya	
+
+
+
+
+
+
+Contoh Solusi: Memindahkan Pencatatan Log Sebelum Penghapusan
+Berikut adalah contoh modifikasi pada skrip delete_task.php agar mencatat log sebelum menghapus tugas:
+
+php
+Copy
+Edit
+<?php
+// delete_task.php
+session_start();
+require 'config.php';
+
+// Pastikan pengguna sudah login
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+
+$user_id = $_SESSION['user_id'];
+
+if (!isset($_GET['id'])) {
+    die("Task ID tidak disediakan.");
+}
+
+$task_id = $_GET['id'];
+
+// Verifikasi apakah tugas tersebut milik pengguna
+$sql = "SELECT * FROM tasks WHERE id = :task_id AND user_id = :user_id";
+$stmt = $pdo->prepare($sql);
+$stmt->execute([
+    'task_id' => $task_id,
+    'user_id' => $user_id
+]);
+$task = $stmt->fetch();
+
+if (!$task) {
+    die("Task tidak ditemukan atau Anda tidak memiliki akses.");
+}
+
+try {
+    // Pertama, catat log penghapusan (sebelum tugas dihapus)
+    $sqlLog = "INSERT INTO task_logs (task_id, user_id, action) VALUES (:task_id, :user_id, 'Dihapus')";
+    $stmtLog = $pdo->prepare($sqlLog);
+    $stmtLog->execute([
+        'task_id' => $task_id,
+        'user_id' => $user_id
+    ]);
+    
+    // Kemudian, hapus tugas dari tabel tasks
+    $sqlDelete = "DELETE FROM tasks WHERE id = :task_id AND user_id = :user_id";
+    $stmtDelete = $pdo->prepare($sqlDelete);
+    $stmtDelete->execute([
+        'task_id' => $task_id,
+        'user_id' => $user_id
+    ]);
+    
+    // Jika constraint foreign key dengan ON DELETE CASCADE aktif, maka baris terkait di tabel task_logs akan dihapus
+    // Namun, karena log penghapusan sudah tercatat, sebaiknya constraint tersebut diubah atau log disimpan di tabel lain
+    header("Location: dashboard.php");
+    exit;
+} catch (PDOException $e) {
+    die("Error: " . $e->getMessage());
+}
+?>
+Catatan:
+Perlu diperhatikan bahwa jika Anda menggunakan ON DELETE CASCADE pada tabel task_logs, maka ketika tugas dihapus, log yang baru saja dimasukkan juga akan ikut dihapus. Untuk itu, Anda mungkin perlu:
+
+Mengubah foreign key di task_logs menjadi ON DELETE SET NULL, atau
+Menyimpan log penghapusan di tabel log yang berbeda tanpa constraint foreign key.
