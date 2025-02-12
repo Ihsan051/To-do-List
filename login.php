@@ -32,62 +32,76 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login & Register</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: linear-gradient(135deg, #ff7eb3, #ff758c);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-        .btn-primary {
-            background-color: #ff4081;
-            border: none;
-        }
-        .btn-primary:hover {
-            background-color: #e6005c;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+  <!-- Memuat font Poppins dari Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #d9d9d9;
+    }
+    .login-container {
+      width: 400px;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    .second-color {
+      background-color: #5faeb6 !important;
+    }
+    .primary-color {
+      background-color: #223c56 !important;
+    }
+    .text-primary {
+        color: #223c56 !important;
+    }
+        .primary-color:hover {
+      background-color: #2c7bc9 !important;
+    }
+    .text-primary {
+        color: #223c56 !important;
+    }
+    .text-primary:hover{
+      color: #2c7bc9 !important;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card p-4">
-                    <h2 class="text-center">Login</h2>
-                    <?php if ($message): ?>
-                    <p><?= $message ?></p>
-                     <?php endif; ?>
-                    <form action="login.php" method="post">
-                        <div class="mb-3">
-                            <label for="Email" class="form-label">Email</label>
-                            <input type="email" class="form-control" name="email" id="Email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="Password" class="form-label">Password</label>
-                            <input type="password" class="form-control" name="password" id="Password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Login</button>
-                    </form>
-                    <p class="text-center mt-3">Belum punya akun? <a href="register.php" >Daftar</a></p>
-                </div>
-            </div>
-        </div>
+  <div class="login-container second-color">
+    <!-- Logo yang ditengah dengan gap lebih kecil antara logo dan form -->
+    <div class="text-center mb-0">
+      <img src="To-do.png" alt="Logo" width="200" class="img-fluid d-block mx-auto">
     </div>
-
-
+    <!-- Mengurangi jarak antara logo dan form dengan memberikan margin-top negatif pada form -->
+    <form class="mt-n1" action="login.php" method="post">
+    <?php if ($message): ?>
+                    <p><?= $message ?></p>
+                     <?php endif; ?>    
+      <div class="mb-3">
+        <label for="email" class="form-label text-light">Email</label>
+        <input type="email" class="form-control" name="email" id="email" placeholder="Masukkan email">
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label text-light">Password</label>
+        <input type="password" class="form-control" name="password" id="password" placeholder="Masukkan password">
+      </div>
+      <button type="submit" class="btn primary-color w-100 text-light">Login</button>
+      <p class="text-center mt-3 mb-1 text-light">
+        Tidak punya akun? <a href="register.php" class="text-decoration-none  text-primary">Daftar</a>
+      </p>
+    </form>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
