@@ -27,108 +27,100 @@ $projects = $stmt->fetchAll();
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title>Dashboard - To-Do List App</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .logout {
-            float: right;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-        table, th, td {
-            border: 1px solid #aaa;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        .action a {
-            margin-right: 10px;
-        }
-        h2, h3 {
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 5px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Dashboard - To-Do List App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Custom CSS tambahan */
+    body {
+      background-color: #f8f9fa;
+    }
+  </style>
 </head>
 <body>
-    <h2>Dashboard</h2>
-    <p>Selamat datang, <strong><?= htmlspecialchars($_SESSION['name']) ?></strong>! <a href="logout.php" class="logout">Logout</a></p>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">To-Do List App</a>
+      <div class="collapse navbar-collapse justify-content-end">
+        <ul class="navbar-nav">
+          <li class="nav-item d-flex align-items-center me-2">
+            <span class="navbar-text">Selamat datang, <strong><?= htmlspecialchars($_SESSION['name']) ?></strong></span>
+          </li>
+          <li class="nav-item">
+            <a href="logout.php" class="nav-link">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
-    <!-- Tampilan Daftar Tugas -->
-    <h3>Daftar Tugas</h3>
-    <p><a href="buat_tugas.php">Buat Tugas Baru</a></p>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Judul</th>
-                <th>Deskripsi</th>
-                <th>Tanggal Jatuh Tempo</th>
-                <th>Status</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if(count($tasks) > 0): ?>
-                <?php foreach($tasks as $task): ?>
-                    <tr>
+  <!-- Konten Dashboard -->
+  <div class="container my-4">
+    <div class="row mb-3">
+      <div class="col">
+        <h2 class="mb-0">Dashboard</h2>
+      </div>
+    </div>
+    <div class="row">
+      <!-- Card Daftar Tugas -->
+      <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Daftar Tugas</h5>
+            <a href="buat_tugas.php" class="btn btn-sm btn-success">Buat Tugas Baru</a>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped table-hover align-middle">
+                <thead class="table-light">
+                  <tr class="text-center align-middle">
+                    <th>ID</th>
+                    <th>Judul</th>
+                    <th>Deskripsi</th>
+                    <th>Tanggal Jatuh Tempo</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php if(count($tasks) > 0): ?>
+                    <?php foreach($tasks as $task): ?>
+                      <tr>
                         <td><?= $task['id'] ?></td>
                         <td><?= htmlspecialchars($task['title']) ?></td>
                         <td><?= htmlspecialchars($task['description']) ?></td>
                         <td><?= $task['due_date'] ?></td>
                         <td><?= $task['status'] ?></td>
-                        <td class="action">
-                            <a href="update_tugas.php?id=<?= $task['id'] ?>">Edit</a>
-                            <a href="hapus_tugas.php?id=<?= $task['id'] ?>" onclick="return confirm('Yakin ingin menghapus tugas ini?');">Hapus</a>
+                        <td>
+                          <div class="btn-group" role="group" aria-label="Action Buttons">
+                            <a href="selesai_tugas.php?id=<?= $task['id'] ?>" class="btn btn-sm btn-success">Selesai</a>
+                            <a href="update_tugas.php?id=<?= $task['id'] ?>" class="btn btn-sm btn-warning mx-2">Edit</a>
+                            <a href="hapus_tugas.php?id=<?= $task['id'] ?>" onclick="return confirm('Yakin ingin menghapus tugas ini?');" class="btn btn-sm btn-danger">Hapus</a>
+                          </div>
                         </td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr>
-                    <td colspan="6">Tidak ada tugas yang ditemukan.</td>
-                </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
-
-    <!-- Tampilan Daftar Proyek -->
-    <h3>Daftar Proyek</h3>
-    <p><a href="buat_project.php">Buat Proyek Baru</a></p>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nama Proyek</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if(count($projects) > 0): ?>
-                <?php foreach($projects as $project): ?>
+                      </tr>
+                    <?php endforeach; ?>
+                  <?php else: ?>
                     <tr>
-                        <td><?= $project['id'] ?></td>
-                        <td><?= htmlspecialchars($project['name']) ?></td>
-                        <td class="action">
-                            <!-- Link ke halaman detail proyek -->
-                            <a href="project_detail.php?project_id=<?= $project['id'] ?>">Lihat Tugas</a>
-                            <a href="update_tugas.php?id=<?= $project['id'] ?>">Edit</a>
-                            <a href="hapus_tugas.php?id=<?= $project['id'] ?>" onclick="return confirm('Yakin ingin menghapus proyek ini?');">Hapus</a>
-                        </td>
+                      <td colspan="6" class="text-center">Tidak ada tugas yang ditemukan.</td>
                     </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr>
-                    <td colspan="3">Tidak ada proyek yang ditemukan.</td>
-                </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
+                  <?php endif; ?>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Daftar Proyek -->
+    
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle (termasuk Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
