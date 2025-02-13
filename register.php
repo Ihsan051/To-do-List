@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       </div> 
       <button type="submit" class="btn primary-color w-100 text-light">Register</button>
       <p class="text-center mt-3 mb-0 text-light">
-        Sudah punya akun? <a href="login.html" class="text-decoration-none text-primary">Login</a>
+        Sudah punya akun? <a href="login.php" class="text-decoration-none text-primary">Login</a>
       </p>
     </form>
   </div>
