@@ -16,14 +16,15 @@ if (!isset($_GET['task_id'])) {
 
 $task_id = $_GET['task_id'];
 
-// Hapus tugas dari database
-$sql = "DELETE FROM tasks WHERE id = :task_id AND user_id = :user_id";
+// Update status tugas menjadi 'Selesai'
+$sql = "UPDATE tasks SET status = 'Selesai' WHERE id = :task_id AND user_id = :user_id";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([
     'task_id' => $task_id,
     'user_id' => $_SESSION['user_id']
 ]);
 
-header("Location: index.php");
+// Setelah update, redirect ke halaman tugas selesai
+header("Location: tugas_selesai.php");
 exit;
 ?>

@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['name']    = $user['name'];
             // Redirect ke halaman dashboard atau halaman utama aplikasi
-            header("Location: dashboard.php");
+            header("Location: index.php");
             exit;
         } else {
             $message = 'Email atau password salah.';
@@ -75,13 +75,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     .text-primary:hover{
       color: #2c7bc9 !important;
     }
+    .form-control-sm{
+      width: 100%;
+      border: none;
+      outline: none;
+    }
+    .form-label{
+      font-size: 15px;
+    }
   </style>
 </head>
 <body>
   <div class="login-container second-color">
     <!-- Logo yang ditengah dengan gap lebih kecil antara logo dan form -->
     <div class="text-center mb-0">
-      <img src="To-do.png" alt="Logo" width="200" class="img-fluid d-block mx-auto">
+      <img src="To-do.png" alt="Logo" width="150" class="img-fluid d-block mx-auto">
     </div>
     <!-- Mengurangi jarak antara logo dan form dengan memberikan margin-top negatif pada form -->
     <form class="mt-n1" action="login.php" method="post">
@@ -90,11 +98,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                      <?php endif; ?>    
       <div class="mb-3">
         <label for="email" class="form-label text-light">Email</label>
-        <input type="email" class="form-control" name="email" id="email" placeholder="Masukkan email">
+        <input type="email" class="form-control-sm" name="email" id="email" placeholder="Masukkan email">
       </div>
-      <div class="mb-3">
+      <div class="mb-3 ">
         <label for="password" class="form-label text-light">Password</label>
-        <input type="password" class="form-control" name="password" id="password" placeholder="Masukkan password">
+        <input type="password" class="form-control-sm" name="password" id="password" placeholder="Masukkan password">
       </div>
       <button type="submit" class="btn primary-color w-100 text-light">Login</button>
       <p class="text-center mt-3 mb-1 text-light">

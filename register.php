@@ -80,6 +80,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     .text-primary:hover{
       color: #2c7bc9 !important;
     }
+     .form-control-sm{
+      width: 100%;
+      border: none;
+      outline: none;
+    }
+    .form-label{
+      font-size: 15px;
+    }
   </style>
 </head>
 <body>
@@ -98,21 +106,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <!-- Form registrasi dengan validasi JavaScript -->
     <form class="mt-n1" action="register.php" method="post" onsubmit="return validatePassword()">
-      <div class="mb-2 mt-0">
+      <div class="mb-3 mt-0">
         <label for="nama_lengkap" class="form-label text-light">Nama Lengkap</label>
-        <input type="text" class="form-control" name="name" id="nama_lengkap" placeholder="Masukkan Nama Lengkap">
+        <input type="text" class="form-control-sm" name="name" id="nama_lengkap" placeholder="Masukkan Nama Lengkap">
       </div>
-      <div class="mb-2">
+      <div class="mb-3">
         <label for="email" class="form-label text-light">E-Mail</label>
-        <input type="email" class="form-control" name="email" id="email" placeholder="Masukkan E-Mail">
+        <input type="email" class="form-control-sm" name="email" id="email" placeholder="Masukkan E-Mail">
       </div>
-      <div class="mb-2">
+      <div class="mb-3">
         <label for="password" class="form-label text-light">Password</label>
-        <input type="password" class="form-control" name="password" id="password" placeholder="Masukkan password">
+        <input type="password" class="form-control-sm" name="password" id="password" placeholder="Masukkan password">
       </div>
       <div class="mb-3">
         <label for="confirm_password" class="form-label text-light">Konfirmasi Password</label>
-        <input type="password" class="form-control" name="confirm_password" id="confirm_password" placeholder="Masukkan password">
+        <input type="password" class="form-control-sm" name="confirm_password" id="confirm_password" placeholder="Masukkan password">
       </div> 
       <button type="submit" class="btn primary-color w-100 text-light">Register</button>
       <p class="text-center mt-3 mb-0 text-light">
