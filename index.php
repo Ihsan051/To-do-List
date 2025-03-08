@@ -1,52 +1,59 @@
 <?php
 session_start();
-require 'database/koneksi.php';
+require 'database/function.php';
 
 // Pastikan pengguna sudah login
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
+$user_id = $_SESSION['user_id'];
 
 $message = '';
 
-// PROSES PENYIMPANAN TASK (jika form disubmit)
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validasi: judul harus diisi
-    if (empty($_POST['title'])) {
-        $message = "Judul harus diisi.";
-    } else {
-        $title       = trim($_POST['title']);
-        $description = isset($_POST['description']) ? trim($_POST['description']) : "";
-        $due_date    = (!empty($_POST['due_date'])) ? $_POST['due_date'] : null;
-        $priority    = (!empty($_POST['priority'])) ? $_POST['priority'] : "Biasa"; // default "Biasa"
+// mengambil data tugas dari database
+$sql = "SELECT * FROM tugas WHERE user_id = $user_id AND status != 'Selesai' ORDER BY tengat_waktu ASC";
+$tugas = query($sql);
 
-        // Insert data tugas ke tabel tasks
-        // Pastikan tabel tasks memiliki kolom status dengan default 'Pending'
-        $sql = "INSERT INTO tasks (user_id, title, description, due_date, priority, status) 
-                VALUES (:user_id, :title, :description, :due_date, :priority, 'Pending')";
-        $stmt = $pdo->prepare($sql);
-        try {
-            $stmt->execute([
-                'user_id'     => $_SESSION['user_id'],
-                'title'       => $title,
-                'description' => $description,
-                'due_date'    => $due_date,
-                'priority'    => $priority
-            ]);
-            $message = "Task berhasil dibuat.";
-        } catch (PDOException $e) {
-            $message = "Error: " . $e->getMessage();
-        }
+// mengambil data kategori dari database
+$sql = "SELECT * FROM kategori WHERE user_id = $user_id";
+$kategori = query($sql);
+
+
+// cek  apakah tombol tambah tugas sudah ditekan
+if( isset($_POST['tambahTugas']) ){
+    // panggil fungsi tambah dan cek hasilnya
+    if( tambahTugas($_POST) > 0 ){
+      echo " <script>
+          alert(' Tugas berhasil ditambahkan ')      
+      </script>";
+      header("location: index.php");
+      exit;
+    } else {
+      echo " <script>
+          alert(' Tugas gagal ditambahkan ')      
+      </script>";
     }
+
 }
 
-// AMBIL DATA TASK untuk pengguna yang sedang login
-// Hanya ambil tugas yang statusnya belum selesai
-$sql = "SELECT * FROM tasks WHERE user_id = :user_id AND status != 'Selesai' ORDER BY due_date ASC";
-$stmt = $pdo->prepare($sql);
-$stmt->execute(['user_id' => $_SESSION['user_id']]);
-$tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// cek apakah tombol tambah kategori ditekan
+if( isset($_POST['tambahKategori']) ){
+  // panggil fungsi tambahKategori dan cek hasilnya
+  if( tambahKategori($_POST) > 0 ){
+    echo " <script>
+        alert(' Kategori berhasil ditambahkan ')      
+    </script>";
+    header("location: index.php");
+    exit;
+  } else {
+    echo " <script>
+        alert(' Kategori gagal ditambahkan ')      
+    </script>";
+  }
+}
+
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -133,12 +140,7 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
     .d-flex.flex-row-reverse a {
       text-decoration: none;
     }
-    .inputProject{
-      display: none;
-    }
-    .tambahProject{
-      display: block;
-    }
+
     /* Responsive: Sidebar pada layar kecil */
     @media (max-width: 768px) {
       #sidebar {
@@ -162,31 +164,48 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <div class="wrapper">
     <!-- Sidebar -->
     <nav id="sidebar">
-      <div class="sidebar-header d-flex justify-content">
-        <img src="profil.svg" class="rounded-5" alt="..." width="55px">
-        <h4 class="ms-3 my-auto">M Ihsan</h4>
+  <div class="sidebar-header d-flex justify-content">
+    <img src="asset/profil.svg" class="rounded-5" alt="..." width="55px">
+    <h4 class="ms-3 my-auto">M Ihsan</h4>
+  </div>
+  <hr class="border opacity-85 m-auto hr-color" width="75%">
+
+  <ul class="components">
+    <li class="active"><a href="#"><i class="bi bi-calendar"></i> Hari Ini</a></li>
+    <li><a href="tugas_selesai.php"><i class="bi bi-calendar-check"></i> Tugas yang selesai</a></li>
+    <li><a href="logout.php">Logout</a></li>
+  </ul>
+
+  <div class="d-flex justify-content-between">
+    <h6 class="ms-3">Kategori</h6>
+    <button class="border-0 bg-transparent" id="tambahKategori"><i class="bi bi-plus-lg"></i></button>
+  </div>
+
+  <div class="inputKategori mx-2" id="inputKategori">
+    <form action="" method="post">
+      <div class="input-group mb-3 mt-2">
+        <input type="text" name="inputKategori" class="form-control" placeholder="Masukan Kategori" aria-label="Kategori Name" required>
+        <button class="btn btn-primary" name="tambahKategori" type="submit">OK</button>
       </div>
-      <hr class="border opacity-85 m-auto hr-color" width="75%">
-      <ul class="components">
-        <li class="active"><a href="#"><i class="bi bi-calendar"></i> Hari Ini</a></li>
-        <li><a href="tugas_selesai.php"><i class="bi bi-calendar-check"></i> Tugas yang selesai</a></li>
-        <li><a href="logout.php">Logout</a></li>
-      </ul>
-      <div class="d-flex justify-content-between">
-        <h6 class="ms-3">Projects</h6>
-        <button class="border-0 bg-transparent" id="tambahProject"><i class="bi bi-plus-lg"></i></button>
-      </div>
-      <div class="inputProject mx-2" id="inputProject">
-        <div class="input-group mb-3 mt-2">
-          <input type="text" name="inputProject" class="form-control" placeholder="Masukan Project" aria-label="Project Name">
-          <button class="btn btn-primary" type="submit">OK</button>
-        </div>
-      </div>
-      <hr class="border opacity-85 m-auto hr-color" width="75%">
-      <ul class="projects components ms-3">
-        <li><i class="bi bi-forward"></i> Workout</li>
-      </ul>
-    </nav>
+    </form>
+  </div>
+
+  <hr class="border opacity-85 m-auto hr-color" width="75%">
+
+  <?php if (!empty($kategori)): ?>
+    <ul class="components">
+      <?php foreach ($kategori as $category): ?>
+        <li>
+          <a href="kategori.php?kategori_id=<?php echo $category['id']; ?>">
+            <i class="bi bi-folder"></i> 
+            <?php echo htmlspecialchars($category['nama']); ?>
+          </a>
+        </li>
+      <?php endforeach; ?>
+    </ul>
+  <?php endif; ?>
+</nav>
+
 
     <!-- Konten Halaman -->
     <div id="content" class="overflow-auto">
@@ -206,64 +225,74 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="alert alert-info"><?php echo htmlspecialchars($message); ?></div>
       <?php endif; ?>
 
-      <div class="d-grid mt-4">
-        <button class="btn btn-primary" type="button" id="tambahTugas"><i class="bi bi-plus-lg"></i> Tambah Tugas</button>
-      </div>
+     <!-- Tombol untuk membuka modal -->
+  <div class="d-grid mt-4">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahTugas">
+      <i class="bi bi-plus-lg"></i> Tambah Tugas
+    </button>
+  </div>
 
-      <!-- Form tambah tugas -->
-      <div class="tambah_tugas" id="inputTugas">
-        <div class="card card-form">
-          <!-- Form submit ke halaman yang sama -->
+  <!-- Modal Tambah Tugas -->
+  <div class="modal fade" id="modalTambahTugas" tabindex="-1" aria-labelledby="modalTambahTugasLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTambahTugasLabel">Tambah Tugas</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
           <form action="" method="post">
             <div class="mb-3">
-              <label for="title" class="form-label">Judul Tugas</label>
-              <input type="text" id="title" name="title" class="form-control" placeholder="Masukkan judul tugas" required>
+              <label for="judul" class="form-label">Judul Tugas</label>
+              <input type="text" id="judul" name="judul" class="form-control" placeholder="Masukkan judul tugas" required>
             </div>
             <div class="mb-3">
-              <label for="description" class="form-label">Deskripsi</label>
-              <textarea id="description" name="description" class="form-control" placeholder="Masukkan deskripsi tugas (opsional)"></textarea>
+              <label for="deskripsi" class="form-label">Deskripsi</label>
+              <textarea id="deskripsi" name="deskripsi" class="form-control" placeholder="Masukkan deskripsi tugas" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="kategori" class="form-label">Kategori</label>
+              <select id="kategori" name="kategori_id" class="form-select">
+                <option value="">-- Masukan kategori --</option>
+                <?php foreach ($kategori as $category): ?>
+                  <option value="<?php echo $category['id']; ?>"><?php echo htmlspecialchars($category['nama']); ?></option>
+                <?php endforeach; ?>
+              </select>
             </div>
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label for="due_date" class="form-label">Tanggal Jatuh Tempo</label>
-                <input type="date" id="due_date" name="due_date" class="form-control">
+                <label for="tengatWaktu" class="form-label" >Tanggal Jatuh Tempo</label>
+                <input type="date" id="tengatWaktu" name="tengatWaktu" class="form-control" required>
               </div>
               <div class="col-md-6 mb-3">
                 <label for="priority" class="form-label">Prioritas</label>
-                <select id="priority" name="priority" class="form-select">
+                <select id="priority" name="prioritas" class="form-select" required>
                   <option value="Biasa">Biasa</option>
                   <option value="Penting">Penting</option>
                   <option value="SangatPenting">Sangat Penting</option>
                 </select>
               </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Tambah tugas</button>
+            <button type="submit" name="tambahTugas" class="btn btn-primary w-100">Tambah Tugas</button>
           </form>
         </div>
       </div>
+    </div>
+  </div>
 
       <!-- Tampilkan daftar tugas sebagai card -->
       <div id="taskList" class="mt-4">
-        <?php if ($tasks): ?>
-          <?php foreach ($tasks as $task): ?>
+        <?php if ($tugas): ?>
+          <?php foreach ($tugas as $task): ?>
             <div class="card mt-4" style="width: 100%;">
               <div class="card-body">
                 <div class="d-flex justify-content-between mb-3">
-                  <p class="mb-0">
-                    <?php 
-                      if (!empty($task['due_date'])) {
-                        setlocale(LC_TIME, 'id_ID.UTF-8');
-                        echo strftime("%e %B %Y", strtotime($task['due_date']));
-                      } else {
-                        echo "Tidak ada tanggal";
-                      }
-                    ?>
-                  </p>
-                  <p class="mb-0"><?php echo htmlspecialchars($task['priority']); ?></p>
+                  <p class="mb-0"><?php echo htmlspecialchars($task['tengat_waktu']); ?></p>
+                  <p class="mb-0"><?php echo htmlspecialchars($task['prioritas']); ?></p>
                 </div>
-                <h5 class="card-title"><?php echo htmlspecialchars($task['title']); ?></h5>
-                <?php if (!empty($task['description'])): ?>
-                  <h6 class="card-subtitle mb-2 text-body-secondary"><?php echo htmlspecialchars($task['description']); ?></h6>
+                <h5 class="card-title"><?php echo htmlspecialchars($task['judul']); ?></h5>
+                <?php if (!empty($task['deskripsi'])): ?>
+                  <h6 class="card-subtitle mb-2 text-body-secondary"><?php echo htmlspecialchars($task['deskripsi']); ?></h6>
                 <?php endif; ?>
                 <!-- Tombol aksi: Selesai, Edit, Hapus -->
                 <div class="d-flex flex-row-reverse">

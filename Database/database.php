@@ -28,6 +28,7 @@ $user = "CREATE TABLE users (
                     id INT PRIMARY KEY AUTO_INCREMENT,
                     name VARCHAR(100) NOT NULL,
                     email VARCHAR(100) UNIQUE NOT NULL,
+                    profil varchar(100),
                     password VARCHAR(255) NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )";
@@ -39,14 +40,14 @@ if($conn->query($user) === TRUE){
 }
 echo "<br>";
 
-$tugas = "CREATE TABLE tasks (
+$tugas = "CREATE TABLE tugas (
         id INT PRIMARY KEY AUTO_INCREMENT,
         user_id INT NOT NULL,
-        project_id int ,
-        title VARCHAR(255) NOT NULL,
-        description TEXT NULL,
-        due_date DATE NULL,
-        priority ENUM('Penting', 'Biasa') DEFAULT 'Biasa',
+        kategori_id int ,
+        judul VARCHAR(255) NOT NULL,
+        deskripsi TEXT,
+        tengat_waktu DATE NOT NULL,
+        prioritas ENUM('Penting', 'Biasa', 'SangatPenting') DEFAULT 'Biasa',
         status ENUM('Belum Selesai', 'Selesai') DEFAULT 'Belum Selesai',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -60,24 +61,22 @@ echo "table user gagal dibuat" . $conn->error;
 }
 echo "<br>";
 
-$project = "CREATE TABLE projects (
+$kategori = "CREATE TABLE kategori (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
-    task_id int not null ,
-    name VARCHAR(100) NOT NULL,
+    nama VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )";
 
-if($conn->query($project) === TRUE){
-echo "table project berhasil dibuat";
+if($conn->query($kategori) === TRUE){
+echo "table kategori berhasil dibuat";
 }else{
-echo "table project gagal dibuat" . $conn->error;
+echo "table kategori gagal dibuat" . $conn->error;
 }
 echo "<br>";
 
-$relasi = "ALTER TABLE tasks ADD FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE";
+$relasi = "ALTER TABLE tugas ADD FOREIGN KEY (kategori_id) REFERENCES kategori(id) ON DELETE CASCADE";
 
 if($conn->query($relasi) === TRUE){
     echo "relasi berhasil dibuat";

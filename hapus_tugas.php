@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'database/koneksi.php';
+require 'database/function.php';
 
 // Pastikan pengguna sudah login
 if (!isset($_SESSION['user_id'])) {
@@ -14,16 +14,15 @@ if (!isset($_GET['task_id'])) {
     exit;
 }
 
-$task_id = $_GET['task_id'];
+// ambil id tugas
+$tugas_id = $_GET['task_id'];
 
-// Hapus tugas dari database
-$sql = "DELETE FROM tasks WHERE id = :task_id AND user_id = :user_id";
-$stmt = $pdo->prepare($sql);
-$stmt->execute([
-    'task_id' => $task_id,
-    'user_id' => $_SESSION['user_id']
-]);
-
-header("Location: index.php");
-exit;
-?>
+// panggi fungsi dan cek keberhasilannya
+if( hapus($tugas_id) > 0 ){
+    
+    header("location: index.php");
+}else{
+    echo "<script>
+            alert(' Tugas gagal dihapus ')      
+        </script>";  
+}

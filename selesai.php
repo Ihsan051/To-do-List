@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'database/koneksi.php';
+require 'database/function.php';
 
 // Pastikan pengguna sudah login
 if (!isset($_SESSION['user_id'])) {
@@ -14,17 +14,14 @@ if (!isset($_GET['task_id'])) {
     exit;
 }
 
-$task_id = $_GET['task_id'];
+$tugas_id = $_GET['task_id'];
 
-// Update status tugas menjadi 'Selesai'
-$sql = "UPDATE tasks SET status = 'Selesai' WHERE id = :task_id AND user_id = :user_id";
-$stmt = $pdo->prepare($sql);
-$stmt->execute([
-    'task_id' => $task_id,
-    'user_id' => $_SESSION['user_id']
-]);
-
-// Setelah update, redirect ke halaman tugas selesai
-header("Location: tugas_selesai.php");
-exit;
+// update status tugas
+if( selesai($tugas_id) > 0 ){
+    header("location: index.php");
+}else{
+    echo "<script>
+            alert(' Tugas gagal diselesaikan ')      
+        </script>";  
+}
 ?>

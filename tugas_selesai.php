@@ -1,18 +1,18 @@
 <?php
 session_start();
-require 'database/koneksi.php';
+require 'database/function.php';
 
 // Pastikan pengguna sudah login
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
+// Ambil user_id dari session
+$user_id = $_SESSION['user_id'];
 
 // Ambil data tugas yang sudah selesai
-$sql = "SELECT * FROM tasks WHERE user_id = :user_id AND status = 'Selesai' ORDER BY due_date ASC";
-$stmt = $pdo->prepare($sql);
-$stmt->execute(['user_id' => $_SESSION['user_id']]);
-$completed_tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$sql = "SELECT * FROM tugas WHERE user_id = $user_id AND status = 'Selesai' ORDER BY tengat_waktu ASC";
+$tugasSelesai = query($sql);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -40,35 +40,32 @@ $completed_tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body>
   <div class="container">
     <h2 class="text-center mt-4">Tugas Selesai</h2>
-    <div class="mt-4">
-      <?php if ($completed_tasks): ?>
-        <?php foreach ($completed_tasks as $task): ?>
-          <div class="card">
-            <div class="card-body">
-              <div class="d-flex justify-content-between mb-3">
-                <p class="mb-0">
-                  <?php 
-                    if (!empty($task['due_date'])) {
-                      setlocale(LC_TIME, 'id_ID.UTF-8');
-                      echo strftime("%e %B %Y", strtotime($task['due_date']));
-                    } else {
-                      echo "Tidak ada tanggal";
-                    }
-                  ?>
-                </p>
-                <p class="mb-0"><?php echo htmlspecialchars($task['priority']); ?></p>
+    <div id="taskList" class="mt-4">
+        <?php if ($tugasSelesai): ?>
+          <?php foreach ($tugasSelesai as $task): ?>
+            <div class="card mt-4" style="width: 100%;">
+              <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                  <p class="mb-0"><?php echo htmlspecialchars($task['tengat_waktu']); ?></p>
+                  <p class="mb-0"><?php echo htmlspecialchars($task['prioritas']); ?></p>
+                </div>
+                <h5 class="card-title"><?php echo htmlspecialchars($task['judul']); ?></h5>
+                <?php if (!empty($task['deskripsi'])): ?>
+                  <h6 class="card-subtitle mb-2 text-body-secondary"><?php echo htmlspecialchars($task['deskripsi']); ?></h6>
+                <?php endif; ?>
+                <!-- Tombol aksi: Selesai, Edit, Hapus -->
+                <div class="d-flex flex-row-reverse">
+                  <!-- Ketika tombol Selesai ditekan, status tugas diubah dan card tidak akan tampil di index -->
+                  <a href="edit_tugas.php?task_id=<?php echo $task['id']; ?>" class="btn btn-warning mx-2 btn-sm">Edit</a>
+                  <a href="hapus_tugas.php?task_id=<?php echo $task['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus tugas ini?')">Hapus</a>
+                </div>
               </div>
-              <h5 class="card-title"><?php echo htmlspecialchars($task['title']); ?></h5>
-              <?php if (!empty($task['description'])): ?>
-                <h6 class="card-subtitle mb-2 text-body-secondary"><?php echo htmlspecialchars($task['description']); ?></h6>
-              <?php endif; ?>
             </div>
-          </div>
-        <?php endforeach; ?>
-      <?php else: ?>
-        <p class="text-center mt-4">Belum ada tugas selesai.</p>
-      <?php endif; ?>
-    </div>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <p class="mt-4 text-center">Belum ada tugas selesai</p>
+        <?php endif; ?>
+      </div>
     <div class="text-center mt-4">
       <a href="index.php" class="btn btn-primary">Kembali ke Daftar Tugas</a>
     </div>

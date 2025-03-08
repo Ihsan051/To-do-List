@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'database/koneksi.php';
+require_once 'database/function.php';
 
 // Pastikan pengguna sudah login
 if (!isset($_SESSION['user_id'])) {
@@ -14,47 +14,26 @@ if (!isset($_GET['task_id'])) {
     exit;
 }
 
-$task_id = $_GET['task_id'];
-$message = '';
+// Ambil data tugas berdasarkan task_id
+$task_id = (int)$_GET['task_id'];
+$task = query("SELECT * FROM tugas WHERE id = $task_id")[0];
 
-// Jika form telah disubmit, proses pembaruan data
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title = trim($_POST['title']);
-    $description = isset($_POST['description']) ? trim($_POST['description']) : "";
-    $due_date = (!empty($_POST['due_date'])) ? $_POST['due_date'] : null;
-    $priority = (!empty($_POST['priority'])) ? $_POST['priority'] : "Biasa";
+// cek apakah tombol edit tugas sudah ditekan
+if (isset($_POST['edit'])) {
+    // tambahkan task_id ke dalam data POST
+    $_POST['id'] = $task_id;
 
-    if (empty($title)) {
-        $message = "Judul harus diisi.";
+    // panggil fungsi editTugas dan cek hasilnya
+    if ( editTugas($_POST ) > 0) {
+        echo "<script>
+            alert('Tugas berhasil diperbarui');
+            window.location.href = 'index.php';
+        </script>";
+        exit;
     } else {
-        $sql = "UPDATE tasks 
-                SET title = :title, description = :description, due_date = :due_date, priority = :priority 
-                WHERE id = :task_id AND user_id = :user_id";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'title'       => $title,
-            'description' => $description,
-            'due_date'    => $due_date,
-            'priority'    => $priority,
-            'task_id'     => $task_id,
-            'user_id'     => $_SESSION['user_id']
-        ]);
-        // Setelah update, arahkan kembali ke index.php
-        header("Location: index.php");
-        exit;
-    }
-} else {
-    // Jika metode GET, ambil data tugas untuk ditampilkan di form
-    $sql = "SELECT * FROM tasks WHERE id = :task_id AND user_id = :user_id";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([
-        'task_id' => $task_id,
-        'user_id' => $_SESSION['user_id']
-    ]);
-    $task = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$task) {
-        header("Location: index.php");
-        exit;
+        echo "<script>
+            alert('Tugas gagal diperbarui');
+        </script>";
     }
 }
 ?>
@@ -78,27 +57,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <form action="" method="post">
       <div class="mb-3">
         <label for="title" class="form-label">Judul Tugas</label>
-        <input type="text" id="title" name="title" class="form-control" value="<?php echo htmlspecialchars($task['title']); ?>" required>
+        <input type="text" id="title" name="judul" class="form-control" value="<?php echo htmlspecialchars($task['judul']); ?>" required>
       </div>
       <div class="mb-3">
         <label for="description" class="form-label">Deskripsi</label>
-        <textarea id="description" name="description" class="form-control"><?php echo htmlspecialchars($task['description']); ?></textarea>
+        <textarea id="description" name="deskripsi" class="form-control"><?php echo htmlspecialchars($task['deskripsi']); ?></textarea>
       </div>
       <div class="row">
         <div class="col-md-6 mb-3">
           <label for="due_date" class="form-label">Tanggal Jatuh Tempo</label>
-          <input type="date" id="due_date" name="due_date" class="form-control" value="<?php echo htmlspecialchars($task['due_date']); ?>">
+          <input type="date" id="due_date" name="tengatWaktu" class="form-control" value="<?php echo htmlspecialchars($task['tengat_waktu']); ?>">
         </div>
         <div class="col-md-6 mb-3">
           <label for="priority" class="form-label">Prioritas</label>
-          <select id="priority" name="priority" class="form-select">
-            <option value="Biasa" <?php if ($task['priority'] == 'Biasa') echo 'selected'; ?>>Biasa</option>
-            <option value="Penting" <?php if ($task['priority'] == 'Penting') echo 'selected'; ?>>Penting</option>
-            <option value="SangatPenting" <?php if ($task['priority'] == 'SangatPenting') echo 'selected'; ?>>Sangat Penting</option>
+          <select id="priority" name="prioritas" class="form-select">
+            <option value="Biasa" <?php if ($task['prioritas'] == 'Biasa') echo 'selected'; ?>>Biasa</option>
+            <option value="Penting" <?php if ($task['prioritas'] == 'Penting') echo 'selected'; ?>>Penting</option>
+            <option value="SangatPenting" <?php if ($task['prioritas'] == 'SangatPenting') echo 'selected'; ?>>Sangat Penting</option>
           </select>
         </div>
       </div>
-      <button type="submit" class="btn btn-primary">Perbarui Tugas</button>
+      <button type="submit" name="edit" class="btn btn-primary">Perbarui Tugas</button>
       <a href="index.php" class="btn btn-secondary">Batal</a>
     </form>
   </div>

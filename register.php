@@ -1,44 +1,14 @@
 <?php
 // register.php
-require 'database/koneksi.php';
+require 'database/function.php';
 
-$message = '';
+// mengecek apakah tombol register sudah di tekan
+if(isset($_POST['register'])){
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Pastikan semua field terisi, termasuk konfirmasi password
-    if (!empty($_POST['name']) && !empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['confirm_password'])) {
-        // Validasi kecocokan password dan konfirmasi password
-        if ($_POST['password'] !== $_POST['confirm_password']) {
-            $message = 'Password dan konfirmasi password tidak cocok!';
-        } else {
-            $name     = trim($_POST['name']);
-            $email    = trim($_POST['email']);
-            // Hash password menggunakan bcrypt
-            $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
-
-            // Query untuk memasukkan data pengguna baru
-            $sql = "INSERT INTO users (name, email, password) VALUES (:name, :email, :password)";
-            $stmt = $pdo->prepare($sql);
-            try {
-                $stmt->execute([
-                    'name'     => $name,
-                    'email'    => $email,
-                    'password' => $password
-                ]);
-                $message = 'Pendaftaran berhasil. Silakan <a href="login.php">Login</a>';
-            } catch (PDOException $e) {
-                // Jika terjadi error, misalnya email sudah terdaftar (error kode 23000)
-                if ($e->getCode() == 23000) {
-                    $message = 'Email sudah terdaftar, gunakan email lain.';
-                } else {
-                    $message = 'Terjadi kesalahan: ' . $e->getMessage();
-                }
-            }
-        }
-    } else {
-        $message = 'Semua field harus diisi!';
-    }
+  // cek data yang dikembalikan oleh function
+  $message = register($_POST);
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -94,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <div class="login-container second-color my-auto mt-3 mb-4">
     <!-- Logo di tengah -->
     <div class="text-center mb-0 mt-n1">
-      <img src="To-do.png" alt="Logo" width="150" class="img-fluid d-block mx-auto">
+      <img src="asset/To-do.png" alt="Logo" width="150" class="img-fluid d-block mx-auto">
     </div>
     
     <!-- Tampilkan notifikasi jika ada pesan -->
@@ -103,26 +73,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <?= $message ?>
       </div>
     <?php endif; ?>
-
-    <!-- Form registrasi dengan validasi JavaScript -->
-    <form class="mt-n1" action="register.php" method="post" onsubmit="return validatePassword()">
+    <form class="mt-n1" action="register.php" method="post">
       <div class="mb-3 mt-0">
         <label for="nama_lengkap" class="form-label text-light">Nama Lengkap</label>
-        <input type="text" class="form-control-sm" name="name" id="nama_lengkap" placeholder="Masukkan Nama Lengkap">
+        <input type="text" class="form-control-sm" name="name" id="nama_lengkap" placeholder="Masukkan Nama Lengkap" required>
       </div>
       <div class="mb-3">
         <label for="email" class="form-label text-light">E-Mail</label>
-        <input type="email" class="form-control-sm" name="email" id="email" placeholder="Masukkan E-Mail">
+        <input type="email" class="form-control-sm" name="email" id="email" placeholder="Masukkan E-Mail" required>
       </div>
       <div class="mb-3">
         <label for="password" class="form-label text-light">Password</label>
-        <input type="password" class="form-control-sm" name="password" id="password" placeholder="Masukkan password">
+        <input type="password" class="form-control-sm" name="password" id="password" placeholder="Masukkan password" required>
       </div>
       <div class="mb-3">
         <label for="confirm_password" class="form-label text-light">Konfirmasi Password</label>
-        <input type="password" class="form-control-sm" name="confirm_password" id="confirm_password" placeholder="Masukkan password">
+        <input type="password" class="form-control-sm" name="confirm_password" id="confirm_password" placeholder="Masukkan password" required>
       </div> 
-      <button type="submit" class="btn primary-color w-100 text-light">Register</button>
+      <button type="submit" name="register" class="btn primary-color w-100 text-light">Register</button>
       <p class="text-center mt-3 mb-0 text-light">
         Sudah punya akun? <a href="login.php" class="text-decoration-none text-primary">Login</a>
       </p>
@@ -130,17 +98,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   </div>
   
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // Fungsi validasi password dan konfirmasi password
-    function validatePassword() {
-        var password = document.getElementById("password").value;
-        var confirmPassword = document.getElementById("confirm_password").value;
-        if (password !== confirmPassword) {
-            alert("Password tidak cocok!");
-            return false; // Mencegah formulir dikirim
-        }
-        return true; // Melanjutkan pengiriman formulir
-    }
-  </script>
-</body>
 </html>

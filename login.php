@@ -1,44 +1,43 @@
 <?php
-// login.php
 session_start();
-require 'database/koneksi.php';
+require 'database/function.php';
 
-$message = '';
+$message = ''; // Pastikan $message diinisialisasi agar bisa ditampilkan nanti
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (!empty($_POST['email']) && !empty($_POST['password'])) {
-        $email = trim($_POST['email']);
-        $password = $_POST['password'];
+// cek apakah user sudah menekan login
+if (isset($_POST['login'])) {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
 
-        // Query untuk mengambil data pengguna berdasarkan email
-        $sql = "SELECT * FROM users WHERE email = :email LIMIT 1";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['email' => $email]);
-        $user = $stmt->fetch();
+    // Jalankan query untuk memanggil email yang sama 
+    $result = mysqli_query($conn, "SELECT * FROM users WHERE email='$email'");
 
-        // Jika pengguna ditemukan dan password cocok
-        if ($user && password_verify($password, $user['password'])) {
-            // Set session untuk menandai bahwa pengguna sudah login
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['name']    = $user['name'];
-            // Redirect ke halaman dashboard atau halaman utama aplikasi
-            header("Location: index.php");
+    // cek apakah ada email yang sama
+    if (mysqli_num_rows($result) === 1) {
+        // ambil semua data dari database
+        $row = mysqli_fetch_assoc($result);
+
+        // cek apakah password yang diinput sama dengan password database
+        if (password_verify($password, $row['password'])) {
+            // buat session
+            $_SESSION['user_id'] = $row['id'];
+            header("location: index.php");
             exit;
         } else {
-            $message = 'Email atau password salah.';
+            $message = "Username atau password salah"; // Pesan error jika password salah
         }
     } else {
-        $message = 'Harap isi email dan password.';
+        $message = "Username atau password salah"; // Pesan error jika email tidak ditemukan
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Page</title>
-  <!-- Memuat font Poppins dari Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
@@ -63,50 +62,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     .primary-color {
       background-color: #223c56 !important;
     }
-    .text-primary {
-        color: #223c56 !important;
-    }
-        .primary-color:hover {
+    .primary-color:hover {
       background-color: #2c7bc9 !important;
     }
     .text-primary {
-        color: #223c56 !important;
+      color: #223c56 !important;
     }
-    .text-primary:hover{
+    .text-primary:hover {
       color: #2c7bc9 !important;
     }
-    .form-control-sm{
+    .form-control-sm {
       width: 100%;
       border: none;
       outline: none;
     }
-    .form-label{
+    .form-label {
       font-size: 15px;
     }
   </style>
 </head>
 <body>
   <div class="login-container second-color">
-    <!-- Logo yang ditengah dengan gap lebih kecil antara logo dan form -->
     <div class="text-center mb-0">
-      <img src="To-do.png" alt="Logo" width="150" class="img-fluid d-block mx-auto">
+      <img src="asset/To-do.png" alt="Logo" width="150" class="img-fluid d-block mx-auto">
     </div>
-    <!-- Mengurangi jarak antara logo dan form dengan memberikan margin-top negatif pada form -->
+    
+    <?php if (!empty($message)) : ?>
+      <div class="alert alert-warning text-center">
+        <?= $message ?>
+      </div>
+    <?php endif; ?>
+
     <form class="mt-n1" action="login.php" method="post">
-    <?php if ($message): ?>
-                    <p><?= $message ?></p>
-                     <?php endif; ?>    
       <div class="mb-3">
         <label for="email" class="form-label text-light">Email</label>
-        <input type="email" class="form-control-sm" name="email" id="email" placeholder="Masukkan email">
+        <input type="email" class="form-control-sm" name="email" id="email" placeholder="Masukkan email" required>
       </div>
-      <div class="mb-3 ">
+      <div class="mb-3">
         <label for="password" class="form-label text-light">Password</label>
-        <input type="password" class="form-control-sm" name="password" id="password" placeholder="Masukkan password">
+        <input type="password" class="form-control-sm" name="password" id="password" placeholder="Masukkan password" required>
       </div>
-      <button type="submit" class="btn primary-color w-100 text-light">Login</button>
+      <button type="submit" name="login" class="btn primary-color w-100 text-light">Login</button>
       <p class="text-center mt-3 mb-1 text-light">
-        Tidak punya akun? <a href="register.php" class="text-decoration-none  text-primary">Daftar</a>
+        Tidak punya akun? <a href="register.php" class="text-decoration-none text-primary">Daftar</a>
       </p>
     </form>
   </div>
