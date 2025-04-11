@@ -6,7 +6,7 @@ $dbname = "Todolist";
 
 $conn = new mysqli($servername, $username, $password);
 
-if(!$conn){
+if (!$conn) {
     echo "Koneksi error";
 }
 $sql = "DROP DATABASE IF EXISTS $dbname";
@@ -33,31 +33,31 @@ $user = "CREATE TABLE users (
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )";
 
-if($conn->query($user) === TRUE){
+if ($conn->query($user) === TRUE) {
     echo "table user berhasil dibuat";
-}else{
+} else {
     echo "table user gagal dibuat" . $conn->error;
 }
 echo "<br>";
 
 $tugas = "CREATE TABLE tugas (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        user_id INT NOT NULL,
-        kategori_id int ,
-        judul VARCHAR(255) NOT NULL,
-        deskripsi TEXT,
-        tengat_waktu DATE NOT NULL,
-        prioritas ENUM('Penting', 'Biasa', 'SangatPenting') DEFAULT 'Biasa',
-        status ENUM('Belum Selesai', 'Selesai') DEFAULT 'Belum Selesai',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    kategori_id INT NULL,
+    judul VARCHAR(255) NOT NULL,
+    deskripsi TEXT,
+    tengat_waktu DATE NOT NULL,
+    prioritas ENUM('Penting', 'Biasa', 'SangatPenting') DEFAULT 'Biasa',
+    status ENUM('Belum Selesai', 'Selesai') DEFAULT 'Belum Selesai',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )";
 
-if($conn->query($tugas) === TRUE){
-echo "table user berhasil dibuat";
-}else{
-echo "table user gagal dibuat" . $conn->error;
+
+if ($conn->query($tugas) === TRUE) {
+    echo "table user berhasil dibuat";
+} else {
+    echo "table user gagal dibuat" . $conn->error;
 }
 echo "<br>";
 
@@ -69,19 +69,17 @@ $kategori = "CREATE TABLE kategori (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )";
 
-if($conn->query($kategori) === TRUE){
-echo "table kategori berhasil dibuat";
-}else{
-echo "table kategori gagal dibuat" . $conn->error;
+if ($conn->query($kategori) === TRUE) {
+    echo "table kategori berhasil dibuat";
+} else {
+    echo "table kategori gagal dibuat" . $conn->error;
 }
 echo "<br>";
 
 $relasi = "ALTER TABLE tugas ADD FOREIGN KEY (kategori_id) REFERENCES kategori(id) ON DELETE CASCADE";
 
-if($conn->query($relasi) === TRUE){
+if ($conn->query($relasi) === TRUE) {
     echo "relasi berhasil dibuat";
-}else{
+} else {
     echo "relasi gagal dibuat";
 }
-
-

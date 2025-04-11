@@ -8,44 +8,48 @@ $dbName = "todolist";
 $conn = mysqli_connect($host, $username, $password, $dbName);
 
 // mengecek apakah koneksi ke database berhasil
-if(!$conn){
+if (!$conn) {
     echo "koneksi gagal" . mysqli_connect_error($conn);
 }
 
 // membuat fungsi untuk melakukan query 
-function query($query) {
+function query($query)
+{
     global $conn;
     $result = mysqli_query($conn, $query);
     $rows = [];
     while ($row = mysqli_fetch_assoc($result)) {
-        $rows[] = $row; 
+        $rows[] = $row;
     }
     return $rows;
 }
 
-// membuat fungsi tambah tugas
-function tambahTugas($data){
+function tambahTugas($data)
+{
     global $conn;
 
     $user_id = $_SESSION['user_id'];
-    $kategori_id = isset($data['kategori_id']) ? (int)$data['kategori_id'] : 'NULL';
+    $kategori_id = isset($data['kategori_id']) && $data['kategori_id'] !== '' ? (int)$data['kategori_id'] : null;
     $judul = htmlspecialchars($data['judul']);
     $deskripsi = htmlspecialchars($data['deskripsi']);
     $tengatWaktu = htmlspecialchars($data['tengatWaktu']);
-    $prioritas = isset($data['prioritas']) ? htmlspecialchars($data['prioritas']) : 'Biasa'; // Default 'Biasa'
+    $prioritas = isset($data['prioritas']) ? htmlspecialchars($data['prioritas']) : 'Biasa';
 
-    // Query insert dengan menentukan kolom yang akan diisi
+    // Handle null kategori
+    $kategoriValue = is_null($kategori_id) ? "NULL" : $kategori_id;
+
     $query = "INSERT INTO tugas (user_id, kategori_id, judul, deskripsi, tengat_waktu, prioritas) 
-              VALUES ('$user_id', $kategori_id, '$judul', '$deskripsi', '$tengatWaktu', '$prioritas')";
+              VALUES ('$user_id', $kategoriValue, '$judul', '$deskripsi', '$tengatWaktu', '$prioritas')";
 
-    // Jalankan query
     mysqli_query($conn, $query);
 
     return mysqli_affected_rows($conn);
 }
 
+
 // membuat fungsi edit tugas
-function editTugas($data){
+function editTugas($data)
+{
     global $conn;
 
     $id = (int)$data['id'];
@@ -71,21 +75,31 @@ function editTugas($data){
 }
 
 // membuat fungsi hapus tugas
-function hapus($id){
+function hapusTugas($id)
+{
     global $conn;
-    mysqli_query($conn," DELETE FROM tugas WHERE id = '$id' ");
+    mysqli_query($conn, " DELETE FROM tugas WHERE id = '$id' ");
+    return mysqli_affected_rows($conn);
+}
+// membuat fungsi hapus kategori
+function hapusKategori($id)
+{
+    global $conn;
+    mysqli_query($conn, " DELETE FROM kategori WHERE id = '$id' ");
     return mysqli_affected_rows($conn);
 }
 
 // membuat fungsi selesaikan tugas
-function selesai($id){
+function selesai($id)
+{
     global $conn;
-    mysqli_query($conn," update tugas set status = 'Selesai' where id = '$id' ");
+    mysqli_query($conn, " update tugas set status = 'Selesai' where id = '$id' ");
     return mysqli_affected_rows($conn);
 }
 
 // membuat fungsi tambah kategori
-function tambahKategori($data){
+function tambahKategori($data)
+{
     global $conn;
 
     $user_id = $_SESSION['user_id'];
@@ -103,12 +117,13 @@ function tambahKategori($data){
 
 
 // membuat fungsi register
-function register($data){
+function register($data)
+{
     global $conn;
-    $nama = $data['name'];
-    $email = $data['email'];
-    $password = $data['password'];
-    $password2 = $data['confirm_password'];
+    $nama = htmlspecialchars($data['name']);
+    $email = htmlspecialchars($data['email']);
+    $password = htmlspecialchars($data['password']);
+    $password2 = htmlspecialchars($data['confirm_password']);
 
     // cek apakah password dan konfirmasi password sama
     if ($password !== $password2) {
@@ -135,3 +150,31 @@ function register($data){
     }
 }
 
+// fungsi notifikasi 
+function getNotifikasi($user_id)
+{
+    $sql = "SELECT * FROM tugas WHERE user_id = $user_id AND status != 'Selesai' ORDER BY tengat_waktu ASC";
+    $tugas = query($sql);
+    $notifikasi = [];
+
+    foreach ($tugas as $task) {
+        $deadline = new DateTime($task['tengat_waktu']);
+        $today = new DateTime();
+        $interval = $today->diff($deadline)->days;
+        $isLate = $deadline < $today;
+
+        if ($isLate) {
+            $notifikasi[] = [
+                'type' => 'danger',
+                'message' => "Tugas <strong>" . htmlspecialchars($task['judul']) . "</strong> telah melewati tenggat waktu!"
+            ];
+        } elseif ($interval <= 2) {
+            $notifikasi[] = [
+                'type' => 'warning',
+                'message' => "Tugas <strong>" . htmlspecialchars($task['judul']) . "</strong> mendekati deadline (" . $task['tengat_waktu'] . ")"
+            ];
+        }
+    }
+
+    return $notifikasi;
+}

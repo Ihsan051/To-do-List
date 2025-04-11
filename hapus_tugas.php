@@ -18,11 +18,11 @@ if (!isset($_GET['task_id'])) {
 $tugas_id = $_GET['task_id'];
 
 // panggi fungsi dan cek keberhasilannya
-if( hapus($tugas_id) > 0 ){
-    
+if (hapusTugas($tugas_id) > 0) {
+
     header("location: index.php");
-}else{
+} else {
     echo "<script>
             alert(' Tugas gagal dihapus ')      
-        </script>";  
+        </script>";
 }

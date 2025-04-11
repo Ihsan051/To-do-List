@@ -10,14 +10,33 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
+// Pastikan kategori_id tersedia
+if (!isset($_GET['kategori_id']) || empty($_GET['kategori_id'])) {
+  header("Location: index.php");
+  exit;
+}
+
+$kategori_id = $_GET['kategori_id'];
+$namaKategori = $_GET['namaKategori'];
+
+// Ambil data kategori
+$sql = "SELECT * FROM kategori WHERE id = $kategori_id AND user_id = $user_id ";
+$kategori = query($sql);
+
 // ambil data user 
 $sqlUser = "SELECT name FROM users WHERE id = $user_id";
 $user = query($sqlUser)[0];
 
-// Ambil data tugas yang sudah selesai
-$sql = "SELECT * FROM tugas WHERE user_id = $user_id AND status = 'Selesai' ORDER BY tengat_waktu ASC";
-$tugasSelesai = query($sql);
+if (!$kategori) {
+  echo "<script>alert('Kategori tidak ditemukan!'); window.location='index.php';</script>";
+  exit;
+}
+
+// Ambil tugas berdasarkan kategori
+$sql = "SELECT * FROM tugas WHERE kategori_id = $kategori_id AND user_id = $user_id AND status != 'Selesai' ORDER BY tengat_waktu ASC";
+$tugas = query($sql);
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -32,6 +51,18 @@ $tugasSelesai = query($sql);
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <style>
+    .card {
+      background: #fff;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
     body {
       font-family: 'Poppins', sans-serif;
       background: #eef4f7;
@@ -42,10 +73,6 @@ $tugasSelesai = query($sql);
       display: flex;
       height: 100vh;
       overflow: hidden;
-    }
-
-    h2 {
-      font-weight: 600;
     }
 
     #sidebar {
@@ -120,9 +147,8 @@ $tugasSelesai = query($sql);
     <!-- Sidebar (Desktop Only) -->
     <?php include 'sidebar.php'; ?>
 
-    <!-- Tugas Selesai -->
     <div id="content">
-      <h2 class="text-center mt-4">Tugas Selesai</h2>
+      <h2 class="text-center mt-4"> <?php echo $namaKategori ?></h2>
       <?php
       $prioritasUrut = ['SangatPenting' => 'Sangat Penting', 'Penting' => 'Penting', 'Biasa' => 'Biasa'];
       $warnaPrioritas = [
@@ -131,7 +157,7 @@ $tugasSelesai = query($sql);
         'Biasa' => 'info'              // biru
       ];
       foreach ($prioritasUrut as $kode => $label):
-        $filtered = array_filter($tugasSelesai, fn($t) => $t['prioritas'] === $kode);
+        $filtered = array_filter($tugas, fn($t) => $t['prioritas'] === $kode);
         if (count($filtered) > 0):
       ?>
           <?php foreach ($filtered as $task): ?>
@@ -146,6 +172,8 @@ $tugasSelesai = query($sql);
                   <p class="card-text"><?= htmlspecialchars($task['deskripsi']) ?></p>
                 <?php endif; ?>
                 <div class="d-flex justify-content-end">
+                  <a href="selesai.php?task_id=<?= $task['id'] ?>" class="btn btn-success btn-sm me-2">Selesai</a>
+                  <a href="edit_tugas.php?task_id=<?= $task['id'] ?>" class="btn btn-warning btn-sm me-2">Edit</a>
                   <a href="hapus_tugas.php?task_id=<?= $task['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus tugas ini?')">Hapus</a>
                 </div>
               </div>
@@ -154,14 +182,13 @@ $tugasSelesai = query($sql);
       <?php endif;
       endforeach; ?>
 
-      <?php if (empty($tugasSelesai)): ?>
+      <?php if (empty($tugas)): ?>
         <div class="alert alert-info text-center">Belum ada tugas.</div>
       <?php endif; ?>
     </div>
 
-
-  <!-- navigasi bawah (mobile only)  -->
-  <?php include 'footer.php'; ?>
+    <!-- navigasi bawah (mobile only)  -->
+    <?php include 'footer.php'; ?>
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
