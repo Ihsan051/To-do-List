@@ -34,91 +34,98 @@ if (isset($_POST['login'])) {
 
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Page</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login - To-Do App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
       font-family: 'Poppins', sans-serif;
+      background-color: #eef4f7;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      background-color: #d9d9d9;
-    }
-
-    .login-container {
-      width: 400px;
+      min-height: 100vh;
       padding: 20px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     }
 
-    .second-color {
-      background-color: #5faeb6 !important;
-    }
-
-    .primary-color {
-      background-color: #223c56 !important;
-    }
-
-    .primary-color:hover {
-      background-color: #2c7bc9 !important;
-    }
-
-    .text-primary {
-      color: #223c56 !important;
-    }
-
-    .text-primary:hover {
-      color: #2c7bc9 !important;
-    }
-
-    .form-control-sm {
+    .login-box {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
       width: 100%;
-      border: none;
-      outline: none;
+      max-width: 420px;
+    }
+
+    .logo {
+      display: block;
+      margin: 0 auto 20px;
+      width: 150px;
     }
 
     .form-label {
-      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .btn-primary-custom {
+      background-color: #223c56;
+      border: none;
+    }
+
+    .btn-primary-custom:hover {
+      background-color: #2c7bc9;
+    }
+
+    .text-link {
+      color: #223c56;
+      text-decoration: none;
+    }
+
+    .text-link:hover {
+      color: #2c7bc9;
+      text-decoration: underline;
+    }
+
+    .form-control {
+      border-radius: 8px;
+      padding: 10px;
     }
   </style>
 </head>
-
 <body>
-  <div class="login-container second-color">
-    <div class="text-center mb-0">
-      <img src="asset/To-do.png" alt="Logo" width="150" class="img-fluid d-block mx-auto">
+
+<div class="login-box">
+  <img src="asset/To-do.png" alt="To-Do Logo" class="logo">
+
+  <?php if (!empty($message)) : ?>
+    <div class="alert alert-danger text-center">
+      <?= $message ?>
+    </div>
+  <?php endif; ?>
+
+  <form action="login.php" method="post">
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input type="email" id="email" name="email" class="form-control" placeholder="Masukkan email" required>
     </div>
 
-    <?php if (!empty($message)) : ?>
-      <div class="alert alert-warning text-center">
-        <?= $message ?>
-      </div>
-    <?php endif; ?>
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <input type="password" id="password" name="password" class="form-control" placeholder="Masukkan password" required>
+    </div>
 
-    <form class="mt-n1" action="login.php" method="post">
-      <div class="mb-3">
-        <label for="email" class="form-label text-light">Email</label>
-        <input type="email" class="form-control-sm" name="email" id="email" placeholder="Masukkan email" required>
-      </div>
-      <div class="mb-3">
-        <label for="password" class="form-label text-light">Password</label>
-        <input type="password" class="form-control-sm" name="password" id="password" placeholder="Masukkan password" required>
-      </div>
-      <button type="submit" name="login" class="btn primary-color w-100 text-light">Login</button>
-      <p class="text-center mt-3 mb-1 text-light">
-        Tidak punya akun? <a href="register.php" class="text-decoration-none text-primary">Daftar</a>
-      </p>
-    </form>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <button type="submit" name="login" class="btn btn-primary-custom w-100 text-white mb-3">Login</button>
+
+    <p class="text-center">
+      Belum punya akun?
+      <a href="register.php" class="text-link">Daftar di sini</a>
+    </p>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

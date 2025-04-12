@@ -6,8 +6,15 @@ if (!isset($_SESSION['user_id'])) {
   header("Location: login.php");
   exit;
 }
+
 $user_id = $_SESSION['user_id'];
-// mengambil fungsi notifikasi di function.php 
+
+// menghapus notifikasi 
+if (isset($_GET['hapus']) && is_numeric($_GET['hapus'])) {
+  $id_tugas = $_GET['hapus'];
+  mysqli_query($conn, "UPDATE tugas SET dilihat = 1 WHERE id = $id_tugas AND user_id = $user_id");
+}
+
 $notifikasi = getNotifikasi($user_id);
 
 // Ambil data pengguna dari database
@@ -110,8 +117,14 @@ $user = query("SELECT * FROM users WHERE id = $user_id")[0];
       <h3 class="mb-4">Notifikasi</h3>
       <?php if (!empty($notifikasi)): ?>
         <?php foreach ($notifikasi as $notif): ?>
-          <div class="alert alert-<?= $notif['type'] ?>"><?= $notif['message'] ?></div>
+          <div class="alert alert-<?= $notif['type'] ?> d-flex justify-content-between align-items-center">
+            <div><?= $notif['message'] ?></div>
+            <a href="?hapus=<?=$notif['id']?>" class="btn btn-sm btn-outline-danger ms-3" onclick="return confirm('Hapus notifikasi ini?')">
+              <i class="bi bi-x-lg"></i>
+            </a>
+          </div>
         <?php endforeach; ?>
+
       <?php else: ?>
         <div class="alert alert-info">Tidak ada notifikasi.</div>
       <?php endif; ?>

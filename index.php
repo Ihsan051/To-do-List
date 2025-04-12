@@ -88,12 +88,17 @@ if (isset($_POST['tambahTugas'])) {
     .navbar-bottom {
       display: none;
     }
+    #hide-desktop{
+      display: none;
+    }
 
     @media (max-width: 768px) {
       #sidebar {
         display: none;
       }
-
+      #hide-mobile{
+        display: none;
+      }
       .navbar-bottom {
         display: flex;
         justify-content: space-around;
@@ -131,10 +136,13 @@ if (isset($_POST['tambahTugas'])) {
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h3>Daftar Tugas</h3>
         <div class="d-flex align-items-center gap-3">
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahTugas">
+
+          <!-- button tambah tugas (desktop)  -->
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahTugas" id="hide-mobile">
             <i class="bi bi-plus-circle"></i> Tambah
           </button>
 
+          <!-- button notifikasi  -->
           <a href="notifikasi.php" class="position-relative text-dark">
             <i class="bi bi-bell" style="font-size: 1.8rem;"></i>
             <?php if (!empty($notifikasi)): ?>
@@ -183,6 +191,12 @@ if (isset($_POST['tambahTugas'])) {
       <?php endif; ?>
     </div>
 
+    <!-- button tambah tugas (mobile)  -->
+    <button class="btn btn-primary rounded-circle shadow mb-5" id="hide-desktop"
+      style="position: fixed; bottom: 70px; right: 20px; z-index: 999;"
+      data-bs-toggle="modal" data-bs-target="#modalTambahTugas">
+      <i class="bi bi-plus-lg" style="font-size: 1.5rem;"></i>
+    </button>
 
     <!-- Modal Tambah Tugas -->
     <div class="modal fade" id="modalTambahTugas" tabindex="-1" aria-labelledby="modalTambahTugasLabel" aria-hidden="true">
@@ -200,7 +214,7 @@ if (isset($_POST['tambahTugas'])) {
               </div>
               <div class="mb-3">
                 <label for="deskripsi" class="form-label">Deskripsi</label>
-                <textarea id="deskripsi" name="deskripsi" class="form-control" required></textarea>
+                <textarea id="deskripsi" name="deskripsi" class="form-control" maxlength="25" required></textarea>
               </div>
               <div class="mb-3">
                 <label for="kategori_id" class="form-label">Kategori</label>
@@ -214,7 +228,7 @@ if (isset($_POST['tambahTugas'])) {
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label for="tengatWaktu" class="form-label">Deadline</label>
-                  <input type="date" id="tengatWaktu" name="tengatWaktu" class="form-control" required>
+                  <input type="date" name="tengatWaktu" class="form-control" min="<?= date('Y-m-d') ?>" required>
                 </div>
                 <div class="col-md-6 mb-3">
                   <label for="prioritas" class="form-label">Prioritas</label>
@@ -241,3 +255,5 @@ if (isset($_POST['tambahTugas'])) {
 </body>
 
 </html>
+
+

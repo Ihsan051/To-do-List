@@ -112,8 +112,8 @@ $user = query("SELECT * FROM users WHERE id = $user_id")[0];
     <div class="container">
       <div class="card text-center">
         <img src="asset/profil.svg" alt="Foto Profil" class="profile-img mx-auto mb-3">
-        <h4><?php echo htmlspecialchars($user['name']); ?></h4>
-        <p class="text-muted mb-1">Email: <?php echo htmlspecialchars($user['email']); ?></p>
+        <h4><?php echo $user['name']; ?></h4>
+        <p class="text-muted mb-1">Email: <?php echo $user['email']; ?></p>
         <p class="text-muted">Bergabung sejak: <?php echo date('d M Y', strtotime($user['created_at'])); ?></p>
         <a href="logout.php" class="btn btn-danger mt-3">Logout</a>
       </div>

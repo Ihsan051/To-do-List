@@ -49,6 +49,7 @@ $tugas = "CREATE TABLE tugas (
     tengat_waktu DATE NOT NULL,
     prioritas ENUM('Penting', 'Biasa', 'SangatPenting') DEFAULT 'Biasa',
     status ENUM('Belum Selesai', 'Selesai') DEFAULT 'Belum Selesai',
+    dilihat BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )";

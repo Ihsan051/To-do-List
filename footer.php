@@ -1,7 +1,7 @@
  <!-- Bottom Navigation (Mobile Only) -->
  <div class="navbar-bottom ">
      <a href="profil.php" class="nav-link text-center">
-         <i class="bi bi-person-circle nav-icon"></i><br><small>Profil</small>
+         <i class="bi bi-person-circle nav-icon "></i><br><small>Profil</small>
      </a>
      <a href="index.php" class="nav-link text-center?>">
          <i class="bi bi-list-task nav-icon"></i><br><small>Tugas</small>
