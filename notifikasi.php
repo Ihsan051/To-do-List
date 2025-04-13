@@ -19,14 +19,17 @@ $notifikasi = getNotifikasi($user_id);
 
 // Ambil data pengguna dari database
 $user = query("SELECT * FROM users WHERE id = $user_id")[0];
+
+// Ambil data kategori dari database
+$sqlKategori = "SELECT * FROM kategori WHERE user_id = $user_id";
+$kategori = query($sqlKategori);
+
 ?>
 
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Notifikasi</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -114,6 +117,8 @@ $user = query("SELECT * FROM users WHERE id = $user_id")[0];
   <div class="wrapper">
     <!-- sidebar Desktop -->
     <?php include 'sidebar.php'; ?>
+
+    <!-- konten  -->
     <div id="content">
       <h3 class="mb-4">Notifikasi</h3>
       <?php if (!empty($notifikasi)): ?>

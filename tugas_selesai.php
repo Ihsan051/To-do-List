@@ -17,6 +17,10 @@ $user = query($sqlUser)[0];
 // Ambil data tugas yang sudah selesai
 $sql = "SELECT * FROM tugas WHERE user_id = $user_id AND status = 'Selesai' ORDER BY tengat_waktu ASC";
 $tugasSelesai = query($sql);
+
+// Ambil data kategori
+$sqlKategori = "SELECT * FROM kategori WHERE user_id = $user_id";
+$kategori = query($sqlKategori);
 ?>
 <!DOCTYPE html>
 <html lang="id">

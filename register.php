@@ -37,15 +37,14 @@ if (isset($_POST['register'])) {
       font-weight: 500;
     }
 
-    .btn-primary {
-      background-color: #007bff;
+    .btn-primary-custom {
+      background-color: #223c56;
       border: none;
     }
 
-    .btn-primary:hover {
-      background-color: #0056b3;
+    .btn-primary-custom:hover {
+      background-color: #2c7bc9;
     }
-
     .text-small {
       font-size: 0.9rem;
     }
@@ -87,7 +86,7 @@ if (isset($_POST['register'])) {
         <label for="confirm_password" class="form-label">Konfirmasi Password</label>
         <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Ulangi password" required>
       </div>
-      <button type="submit" name="register" class="btn btn-primary w-100">Daftar</button>
+      <button type="submit" name="register" class="btn btn-primary-custom w-100 text-white mb-3">Daftar</button>
     </form>
 
     <p class="text-center text-small mt-3 mb-0">

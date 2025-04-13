@@ -153,8 +153,8 @@ function register($data)
 // notifikasi 
 function getNotifikasi($user_id)
 {
-    $today = date('Y-m-d');
-    $sql = "SELECT * FROM tugas WHERE user_id = $user_id AND status != 'Selesai' AND tengat_waktu < '$today' AND dilihat = 0";
+    $todayDate = date('Y-m-d');
+    $sql = "SELECT * FROM tugas WHERE user_id = $user_id AND status != 'Selesai' AND dilihat = 0";
     $tugas = query($sql);
     $notifikasi = [];
 
@@ -162,7 +162,7 @@ function getNotifikasi($user_id)
         $deadline = new DateTime($task['tengat_waktu']);
         $today = new DateTime();
         $interval = $today->diff($deadline)->days;
-        $isLate = $deadline < $today;
+        $isLate = $interval < 0;
         $id = $task['id'];
 
         if ($isLate) {
@@ -171,10 +171,10 @@ function getNotifikasi($user_id)
                 'message' => "Tugas <strong>" . htmlspecialchars($task['judul']) . "</strong> telah melewati tenggat waktu!",
                 'id' => $id
             ];
-        } elseif ($interval <= 2) {
+        } elseif ($interval === 0) {
             $notifikasi[] = [
                 'type' => 'warning',
-                'message' => "Tugas <strong>" . htmlspecialchars($task['judul']) . "</strong> mendekati deadline (" . $task['tengat_waktu'] . ")",
+                'message' => "Hari ini Deadline dari tugas <strong> " . htmlspecialchars($task['judul']) . "</strong> " . $task['tengat_waktu'],
                 'id' => $id
             ];
         }
