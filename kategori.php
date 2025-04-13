@@ -164,7 +164,7 @@ if (isset($_POST['tambahKategori'])) {
                   <a href="kategoriDetail.php?kategori_id=<?= $category['id'] ?>&namaKategori=<?= $category['nama'] ?>" class="text-decoration-none text-dark flex-grow-1">
                     <i class="bi bi-folder-fill me-2"></i><?= htmlspecialchars($category['nama']) ?>
                   </a>
-                  <form method="get" action="hapusKategori.php" onsubmit="return confirm('Yakin ingin menghapus kategori ini?')" class="ms-2">
+                  <form method="get" action="hapusKategori.php" onsubmit="return confirm('Yakin ingin menghapus kategori ini? Tugas yang ada di dalam kategori akan terhapus')" class="ms-2">
                     <input type="hidden" name="kategori_id" value="<?= $category['id'] ?>">
                     <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus Kategori">
                       <i class="bi bi-trash"></i>

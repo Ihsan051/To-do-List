@@ -74,6 +74,53 @@ function editTugas($data)
     return mysqli_affected_rows($conn);
 }
 
+function updateUserProfile($user_id, $data, $files) {
+    global $conn;
+
+    $name = htmlspecialchars($data['name']);
+    $email = htmlspecialchars($data['email']);
+    $oldPassword = $data['old_password'];
+    $newPassword = $data['new_password'];
+    $confirmPassword = $data['confirm_password'];
+
+    $message = "";
+    $error = "";
+
+    // Update foto jika ada upload
+    if (isset($files['profil']) && $files['profil']['error'] === 0) {
+        $imgName = $files['profil']['name'];
+        $imgTmp = $files['profil']['tmp_name'];
+        $imgExt = pathinfo($imgName, PATHINFO_EXTENSION);
+        $imgNew = "profile_" . time() . ".$imgExt";
+        move_uploaded_file($imgTmp, "uploads/" . $imgNew);
+        mysqli_query($conn, "UPDATE users SET profil = '$imgNew' WHERE id = $user_id");
+    }
+
+    // Update nama dan email
+    mysqli_query($conn, "UPDATE users SET name = '$name', email = '$email' WHERE id = $user_id");
+
+    // Cek password jika diisi
+    if ($oldPassword && $newPassword && $newPassword === $confirmPassword) {
+        $user = query("SELECT * FROM users WHERE id = $user_id")[0];
+        if (password_verify($oldPassword, $user['password'])) {
+            $hashed = password_hash($newPassword, PASSWORD_DEFAULT);
+            mysqli_query($conn, "UPDATE users SET password = '$hashed' WHERE id = $user_id");
+            $message = "Profil dan password berhasil diperbarui.";
+        } else {
+            $error = "Password lama salah.";
+        }
+    } else {
+        $message = "Profil berhasil diperbarui.";
+        header("Location: profil.php"); 
+        exit;
+    }
+
+    return [
+        "message" => $message,
+        "error" => $error
+    ];
+}
+
 // membuat fungsi hapus tugas
 function hapusTugas($id)
 {
