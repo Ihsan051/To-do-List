@@ -25,7 +25,8 @@ $user = query("SELECT * FROM users WHERE id = $user_id")[0];
 <html lang="id">
 
 <head>
-  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Notifikasi</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -129,6 +130,7 @@ $user = query("SELECT * FROM users WHERE id = $user_id")[0];
         <div class="alert alert-info">Tidak ada notifikasi.</div>
       <?php endif; ?>
     </div>
+  </div>
     <!-- footer Mobile  -->
     <?php include 'footer.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

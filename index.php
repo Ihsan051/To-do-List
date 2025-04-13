@@ -93,6 +93,9 @@ if (isset($_POST['tambahTugas'])) {
     }
 
     @media (max-width: 768px) {
+      #hide-desktop{
+        display: block;
+      }
       #sidebar {
         display: none;
       }
@@ -192,7 +195,7 @@ if (isset($_POST['tambahTugas'])) {
     </div>
 
     <!-- button tambah tugas (mobile)  -->
-    <button class="btn btn-primary rounded-circle shadow mb-5" id="hide-desktop"
+    <button class="btn btn-primary rounded-circle shadow mb-5 " id="hide-desktop"
       style="position: fixed; bottom: 70px; right: 20px; z-index: 999;"
       data-bs-toggle="modal" data-bs-target="#modalTambahTugas">
       <i class="bi bi-plus-lg" style="font-size: 1.5rem;"></i>
