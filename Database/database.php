@@ -84,3 +84,15 @@ if ($conn->query($relasi) === TRUE) {
 } else {
     echo "relasi gagal dibuat";
 }
+echo "<br>";
+
+// Tambah kategori default "Tanpa Kategori"
+$defaultKategori = "INSERT INTO kategori (user_id, nama) 
+                    SELECT id, 'Tanpa Kategori' FROM users";
+
+if ($conn->query($defaultKategori) === TRUE) {
+    echo "Kategori default berhasil ditambahkan<br>";
+} else {
+    echo "Gagal menambahkan kategori default: " . $conn->error . "<br>";
+}
+

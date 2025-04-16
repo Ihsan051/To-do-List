@@ -27,24 +27,51 @@ function query($query)
 function tambahTugas($data)
 {
     global $conn;
-
     $user_id = $_SESSION['user_id'];
-    $kategori_id = isset($data['kategori_id']) && $data['kategori_id'] !== '' ? (int)$data['kategori_id'] : null;
+    
     $judul = htmlspecialchars($data['judul']);
     $deskripsi = htmlspecialchars($data['deskripsi']);
     $tengatWaktu = htmlspecialchars($data['tengatWaktu']);
     $prioritas = isset($data['prioritas']) ? htmlspecialchars($data['prioritas']) : 'Biasa';
 
-    // Handle null kategori
-    $kategoriValue = is_null($kategori_id) ? "NULL" : $kategori_id;
+    // Cek jika kategori kosong
+    if (empty($data['kategori_id'])) {
+        // Ambil id kategori "Tanpa Kategori" milik user
+        $queryKategori = "SELECT id FROM kategori WHERE user_id = '$user_id' AND nama = 'Tanpa Kategori' LIMIT 1";
+        $resultKategori = mysqli_query($conn, $queryKategori);
+        if ($row = mysqli_fetch_assoc($resultKategori)) {
+            $kategori_id = $row['id'];
+        } else {
+            // Jika belum ada, buat dulu
+            mysqli_query($conn, "INSERT INTO kategori (user_id, nama) VALUES ('$user_id', 'Tanpa Kategori')");
+            $kategori_id = mysqli_insert_id($conn);
+        }
+    } else {
+        $kategori_id = (int)$data['kategori_id'];
+    }
+
+    // Cek duplikasi tugas
+    $cekQuery = "SELECT * FROM tugas WHERE user_id = '$user_id' 
+                 AND judul = '$judul' 
+                 AND deskripsi = '$deskripsi' 
+                 AND tengat_waktu = '$tengatWaktu' 
+                 AND prioritas = '$prioritas'";
+
+    $result = mysqli_query($conn, $cekQuery);
+
+    if (mysqli_num_rows($result) > 0) {
+        return 0; // Duplikat
+    }
 
     $query = "INSERT INTO tugas (user_id, kategori_id, judul, deskripsi, tengat_waktu, prioritas) 
-              VALUES ('$user_id', $kategoriValue, '$judul', '$deskripsi', '$tengatWaktu', '$prioritas')";
+              VALUES ('$user_id', $kategori_id, '$judul', '$deskripsi', '$tengatWaktu', '$prioritas')";
 
     mysqli_query($conn, $query);
 
     return mysqli_affected_rows($conn);
 }
+
+
 
 
 // membuat fungsi edit tugas
@@ -197,35 +224,34 @@ function register($data)
     }
 }
 
-// notifikasi 
-function getNotifikasi($user_id)
-{
-    $todayDate = date('Y-m-d');
-    $sql = "SELECT * FROM tugas WHERE user_id = $user_id AND status != 'Selesai' AND dilihat = 0";
-    $tugas = query($sql);
-    $notifikasi = [];
+    // notifikasi 
+    function getNotifikasi($user_id)
+    {
+        $todayDate = date('Y-m-d');
+        $sql = "SELECT * FROM tugas WHERE user_id = $user_id AND status != 'Selesai' AND dilihat = 0";
+        $tugas = query($sql);
+        $notifikasi = [];
 
-    foreach ($tugas as $task) {
-        $deadline = new DateTime($task['tengat_waktu']);
-        $today = new DateTime();
-        $interval = $today->diff($deadline)->days;
-        $isLate = $interval < 0;
-        $id = $task['id'];
+        foreach ($tugas as $task) {
+            $deadline = new DateTime($task['tengat_waktu']);
+            $today = new DateTime();
+            $interval = $today->diff($deadline)->days;
+            $id = $task['id'];
 
-        if ($isLate) {
-            $notifikasi[] = [
-                'type' => 'danger',
-                'message' => "Tugas <strong>" . htmlspecialchars($task['judul']) . "</strong> telah melewati tenggat waktu!",
-                'id' => $id
-            ];
-        } elseif ($interval === 0) {
-            $notifikasi[] = [
-                'type' => 'warning',
-                'message' => "Hari ini Deadline dari tugas <strong> " . htmlspecialchars($task['judul']) . "</strong> " . $task['tengat_waktu'],
-                'id' => $id
-            ];
+            if ($interval > 0) {
+                $notifikasi[] = [
+                    'type' => 'danger',
+                    'message' => "Tugas <strong>" . htmlspecialchars($task['judul']) . "</strong> telah melewati tenggat waktu!",
+                    'id' => $id
+                ];
+            } elseif ($interval === 0) {
+                $notifikasi[] = [
+                    'type' => 'warning',
+                    'message' => "Hari ini Deadline dari tugas <strong> " . htmlspecialchars($task['judul']) . "</strong> " . $task['tengat_waktu'],
+                    'id' => $id
+                ];
+            }
         }
-    }
 
-    return $notifikasi;
-}
+        return $notifikasi;
+    }
